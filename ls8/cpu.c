@@ -8,23 +8,31 @@
 
 unsigned char cpu_ram_read(struct cpu *cpu, unsigned char mar)
 {
+  // mar = Memory Address registersister, holds the memory address being written or writing
+  // return value from ram specified by mar
   return cpu->ram[mar];
 }
 
 void cpu_ram_write(struct cpu *cpu, unsigned char index, unsigned char mdr)
 {
+  // mdr = Memory Data registersister, holds the value to write or just read
+  // write mdr in ram
   cpu->ram[index] = mdr;
 }
 
 void cpu_push(struct cpu *cpu, unsigned char val)
 {
+  // Decrement SP
   cpu->registers[SP]--;
-  cpu_ram_written(cpu, cpu->registers[SP], val);
+  // Copy the value in the given reg to the address pointed to by SP
+  cpu_ram_write(cpu, cpu->registers[SP], val);
 }
 
-unsigned char cou_pop(struct cpu *cpu)
+unsigned char cpu_pop(struct cpu *cpu)
 {
+  //Read last value from stack
   unsigned char val = cpu_ram_read(cpu, cpu->registers[SP]);
+  // Increment SP
   cpu->registers[SP]++;
   return val;
 }
@@ -40,13 +48,15 @@ void cpu_load(struct cpu *cpu, char *filename)
     exit(2);
   }
 
-  char line[8912];
+  char line[8912]; //hold individual lines in the file
   int address = 0;
 
   while (fgets(line, sizeof(line), fp) != NULL)
   {
-    char *endptr;
+    char *endptr; // to keep track of non-numbers in the file
+    //converts str to number
     unsigned char byte = strtoul(line, &endptr, 2);
+    //prevents unnecessary lines from being stored on ram
     if (endptr == line)
     {
       continue;
@@ -72,11 +82,14 @@ void cpu_run(struct cpu *cpu)
     switch (command)
     {
     case LDI:
+      // sets value of operand1 to the registers[operand1]
       cpu->registers[operand1] = operand2;
+      // Move the PC to the next instruction
       cpu->PC += 3;
       break;
     case PRN:
       printf("%d\n", cpu->registers[operand1]);
+      // Move the PC to the next instruction
       cpu->PC += 2;
       break;
     case MUL:
@@ -94,12 +107,15 @@ void cpu_run(struct cpu *cpu)
       break;
 
     case POP:
+      // Copy the value from the address pointed to by SP to the given registers
       cpu->registers[operand1] = cpu_pop(cpu);
       cpu->PC += 2;
       break;
 
     case HLT:
+      // Set running to false to stop program
       running = 0;
+      // Move the PC to the next instruction
       cpu->PC += 1;
       break;
 
@@ -114,12 +130,15 @@ void cpu_run(struct cpu *cpu)
 /** Initialize a COU struct */
 void cpu_init(struct cpu *cpu)
 {
+  // R0-R6 are cleared to 0
   for (int i = 0; i < 6; i++)
   {
     cpu->registers[i] = 0;
   }
-
+  // R7 is set to 0xF4
   cpu->registers[7] = 0xF4;
+  // PC is cleared to 0
   cpu->PC = 0;
+  // RAM is cleared to 0
   memset(cpu->ram, 0, sizeof(cpu->ram));
 }
