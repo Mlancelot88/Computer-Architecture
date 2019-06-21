@@ -3,10 +3,12 @@
 
 // Holds all information about the CPU
 struct cpu {
-  // TODO
-  // PC
-  // registers (array)
-  // ram (array)
+ unsigned int PC;
+ unsigned int IM;
+ unsigned int IS;
+ unsigned int SP;
+ unsigned char registers[8];
+ unsigned char ram[256];
 };
 
 // ALU operations
