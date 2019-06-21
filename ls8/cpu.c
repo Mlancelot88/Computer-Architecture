@@ -66,7 +66,7 @@ void cpu_load(struct cpu *cpu, char *filename)
   fclose(fp);
 }
 
-/** Run the CPU */
+/* Run the CPU */
 void cpu_run(struct cpu *cpu)
 {
   //True until we get a HLT instruction
@@ -127,7 +127,7 @@ void cpu_run(struct cpu *cpu)
   }
 }
 
-/** Initialize a COU struct */
+/* Initialize a CPU struct */
 void cpu_init(struct cpu *cpu)
 {
   // R0-R6 are cleared to 0
